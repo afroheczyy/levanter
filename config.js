@@ -7,6 +7,15 @@ if (existsSync(configPath)) require('dotenv').config({ path: configPath })
 const toBool = (x) => x == 'true'
 const DATABASE_URL =
   process.env.DATABASE_URL === undefined ? databasePath : process.env.DATABASE_URL
+const normalizeMode = (raw) => {
+  const m = String(raw || 'false')
+    .trim()
+    .toLowerCase()
+  if (m === 'true' || m === 'both') return 'both'
+  if (m === 'only' || m === 'api') return 'api'
+  return 'bot'
+}
+const MODE = normalizeMode(process.env.API_MODE)
 module.exports = {
   VERSION: require('./package.json').version,
   SESSION_ID: (process.env.SESSION_ID || 'levanter_2297eb0b7601e845069e3284e2c876a07c').trim(),
@@ -110,6 +119,14 @@ module.exports = {
   WHITE_LIST: process.env.WHITE_LIST || '',
   BOT_LANG: process.env.BOT_LANG || 'en',
   YT_COOKIE: process.env.YT_COOKIE,
-  GROQ_MODEL: (process.env.GROQ_MODEL || 'llama-3.3-70b-versatile').trim(),
+  GROQ_MODEL: (process.env.GROQ_MODEL || 'openai/gpt-oss-120b').trim(),
   GROQ_API_KEY: (process.env.GROQ_API_KEY || '').trim(),
+  OPENROUTER_API_KEY: (process.env.OPENROUTER_API_KEY || '').trim(),
+  OPENROUTER_MODEL: (process.env.OPENROUTER_MODEL || 'openai/gpt-oss-20b:free').trim(),
+  MODE,
+  API_ENABLED: MODE !== 'bot',
+  BOT_ENABLED: MODE !== 'api',
+  API_KEY: (process.env.API_KEY || '').trim(),
+  API_WEBHOOK_URL: (process.env.API_WEBHOOK_URL || '').trim(),
+  API_PUBLIC_URL: (process.env.API_PUBLIC_URL || '').trim(),
 }
